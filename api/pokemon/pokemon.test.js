@@ -46,6 +46,29 @@ describe("Pokemon model functions", () => {
       pokemon = await db("pokemon");
       expect(pokemon).toHaveLength(2);
     });
-    test("inserted correct data", async () => {});
+    test("inserted correct data", async () => {
+      const pokemon = await Pokemon.insert(pokemon1);
+      expect(pokemon).toMatchObject({
+        pokeId: 1,
+        pokemon_name: "Gengar",
+        pokemon_type: "Ghost",
+        pokemon_nickname: "Sneaky",
+      });
+    });
+  });
+  describe("[DELETE] pokemon", () => {
+    test("deletes pokemon from the db", async () => {
+      const [pokeId] = await db("pokemon").insert(pokemon1);
+      let poke = await db("pokemon").where({ pokeId }).first();
+      expect(poke).toBeTruthy();
+      await request(server).delete("/api/pokemon/" + pokeId);
+      poke = await db("pokemon").where({ pokeId }).first();
+      expect(poke).toBeFalsy();
+    });
+    test("responds with the deleted pokemon", async () => {
+      await db("pokemon").insert(pokemon2);
+      let poke = await request(server).delete("/api/pokemon/2");
+      expect(poke.body).toMatchObject(pokemon2);
+    });
   });
 });

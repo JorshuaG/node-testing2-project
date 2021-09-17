@@ -13,8 +13,10 @@ async function insert(pokemon) {
   return db("pokemon").where("pokeId", id).first();
 }
 
-function remove(pokeId) {
-  return null;
+async function remove(pokeId) {
+  const poke = await db("pokemon").where({ pokeId }).first();
+  await db("pokemon").where({ pokeId }).del();
+  return poke;
 }
 
 module.exports = { get, getById, insert, remove };
